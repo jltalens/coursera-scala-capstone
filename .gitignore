@@ -1,0 +1,8 @@
+.idea
+project
+capstone-ui
+spark-warehouse
+target
+*.sbt
+*.html
+src/main/resources

@@ -16,6 +16,28 @@ object Visualization {
     ???
   }
 
+
+  /**
+    *   Distance between two points using spherical law of cosines:
+  	*          d = acos( sin φ1 ⋅ sin φ2 + cos φ1 ⋅ cos φ2 ⋅ cos Δλ ) ⋅ R
+    *          being: φ -> latitude in radians; λ -> longitude in radians
+    * @param p1 point 1
+    * @param p2 point 1
+    * @return distance between points
+    */
+  def distance(p1: Location, p2: Location): Double = {
+    def toRadians(degrees: Double) = degrees * Math.PI / 180
+
+    val R = 6371e3
+    val φ1 = toRadians(p1.lat)
+    val φ2 = toRadians(p2.lat)
+    val λ1 = toRadians(p1.lon)
+    val λ2 = toRadians(p2.lon)
+    val Δλ = λ2 - λ1
+
+    Math.acos(Math.sin(φ1) * Math.sin(φ2) + Math.cos(φ1) * Math.cos(φ2) * Math.cos(Δλ)) * R
+  }
+
   /**
     * @param points Pairs containing a value and its associated color
     * @param value The value to interpolate

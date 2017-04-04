@@ -1,6 +1,9 @@
 package observatory.model
 
 object Temperatures extends ArrayExtensions {
+
+  private val MAX_TEMP = "9999.9"
+
   def parse(line: String) = {
     val args = line.split(",")
     Temperatures(
@@ -8,11 +11,16 @@ object Temperatures extends ArrayExtensions {
       wban = getIfDefinedAt(args, 1),
       month = getIfDefinedAt(args, 2).map(_.toInt),
       day = getIfDefinedAt(args, 3).map(_.toInt),
-      temperature = getIfDefinedAt(args, 4).map(_.toDouble).map(toCelsius)
+      temperature = mapTemperature(getIfDefinedAt(args, 4))
     )
   }
 
-  def toCelsius(temp: Double) : Double = {
+  private def mapTemperature(temp: Option[String]): Option[Double] = temp match {
+    case None => None
+    case Some(t) => if (t == MAX_TEMP) None else temp.map(_.toDouble).map(toCelsius)
+  }
+
+  private def toCelsius(temp: Double) : Double = {
     BigDecimal((temp - 32) / 1.8).setScale(2, BigDecimal.RoundingMode.HALF_UP).toDouble
   }
 }

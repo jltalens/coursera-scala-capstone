@@ -30,7 +30,9 @@ object Extraction {
     * @return A sequence containing triplets (date, location, temperature)
     */
   def locateTemperatures(year: Int, stationsFile: String, temperaturesFile: String): Iterable[(LocalDate, Location, Double)] = {
-    ???
+    val rddStations = spark.sparkContext.textFile(stationsFile).map(Stations.parse)
+    val rddTemperatures = spark.sparkContext.textFile(temperaturesFile).map(Temperatures.parse)
+    locateTemperatures(year, rddStations, rddTemperatures)
   }
 
   def locateTemperatures(year: Int, rddStations: RDD[Stations], rddTemperatures: RDD[Temperatures]): Iterable[(LocalDate, Location, Double)] = {

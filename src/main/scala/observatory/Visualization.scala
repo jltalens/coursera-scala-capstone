@@ -39,6 +39,18 @@ object Visualization {
   }
 
   /**
+    * Uses the inverse distance weighting to estimate the temperate on a point given a range:
+    *       u(x) = ui if (d(x, xi) == 0) for some i
+    *              ∑(i=1,N) wi(x)ui / ∑(i=1,N) wi(x)
+    *       being: wi(x) = 1 / d(x,xi) ** p
+    *       being p a supplier power parameter
+    * @param p
+    * @param range
+    * @return estimated temperature
+    */
+  def estimate(p: Location, range: Iterable[(Location, Double)]) : Double = ???
+
+  /**
     * @param points Pairs containing a value and its associated color
     * @param value The value to interpolate
     * @return The color that corresponds to `value`, according to the color scale defined by `points`

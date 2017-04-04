@@ -1,6 +1,6 @@
 package observatory
 
-import java.time.{LocalDate, LocalTime}
+import java.time.LocalDate
 
 import observatory.model.{Stations, Temperatures}
 import org.apache.spark.rdd.RDD
@@ -20,8 +20,6 @@ object Extraction {
       .appName("Observatory")
       .config("spark.master", "local")
       .getOrCreate()
-//  val rdd = spark.sparkContext.textFile()
-
 
   /**
     * @param year             Year number
@@ -30,8 +28,20 @@ object Extraction {
     * @return A sequence containing triplets (date, location, temperature)
     */
   def locateTemperatures(year: Int, stationsFile: String, temperaturesFile: String): Iterable[(LocalDate, Location, Double)] = {
-    val rddStations = spark.sparkContext.textFile(stationsFile).map(Stations.parse)
-    val rddTemperatures = spark.sparkContext.textFile(temperaturesFile).map(Temperatures.parse)
+    val rddStations = spark
+      .sparkContext
+      .textFile(getClass
+        .getResource(stationsFile)
+        .getPath
+      )
+      .map(Stations.parse)
+    val rddTemperatures = spark
+      .sparkContext
+      .textFile(getClass
+        .getResource(temperaturesFile)
+        .getPath
+      )
+      .map(Temperatures.parse)
     locateTemperatures(year, rddStations, rddTemperatures)
   }
 
@@ -61,8 +71,15 @@ object Extraction {
     * @param records A sequence containing triplets (date, location, temperature)
     * @return A sequence containing, for each location, the average temperature over the year.
     */
-  def locationYearlyAverageRecords(records: Iterable[(LocalDate, Location, Double)]): Iterable[(Location, Double)] = {
-    ???
+  def locationYearlyAverageRecords(records: Iterable[(LocalDate, Location, Double)]): Iterable[(Location, Double)] = records
+      .groupBy(_._2)
+      .mapValues(getAverageTemperature)
+      .values
+
+
+  def getAverageTemperature(tempsInStation: Iterable[(LocalDate, Location, Double)]): (Location, Double) = {
+    val temp = tempsInStation.foldLeft(0.0)((acc, actual) => acc + actual._3) / tempsInStation.size
+    (tempsInStation.head._2, temp)
   }
 
 }

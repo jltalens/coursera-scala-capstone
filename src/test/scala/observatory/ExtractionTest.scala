@@ -12,11 +12,11 @@ import org.scalatest.junit.JUnitRunner
 class ExtractionTest extends FunSuite {
 
   val rddStations: RDD[Stations] = Extraction.spark.sparkContext
-    .textFile("src/test/resources/stations.csv")
+    .textFile(getClass.getResource("/stations.csv").getPath)
     .map(Stations.parse)
 
   val rddTemperatures: RDD[Temperatures] = Extraction.spark.sparkContext
-    .textFile("src/test/resources/2015.csv")
+    .textFile(getClass.getResource("/2015.csv").getPath)
     .map(Temperatures.parse)
 
   test("'locateTemperatures' should return the temperature converted in degrees") {
@@ -28,6 +28,22 @@ class ExtractionTest extends FunSuite {
       (LocalDate.of(2015, 1, 29), Location(37.358, -78.438), 2.0)
     )
     assertResult(expected)(actual)
+  }
+
+  test("'getAverageTemperature()' should return the average temperature of a station") {
+    val expected =  (Location(37.358, -78.433), 1.0)
+    val actual = Extraction.getAverageTemperature(Seq(
+      (LocalDate.of(2015, 12, 6), Location(37.358, -78.433), 0.0),
+      (LocalDate.of(2015, 1, 29), Location(37.358, -78.433), 2.0)
+    ))
+    assertResult(expected)(actual)
+
+    val expected2 = (Location(37.35, -78.433), 27.3)
+    val actual2 = Extraction.getAverageTemperature(Seq(
+      (LocalDate.of(2015, 8, 11), Location(37.35, -78.433), 27.3)
+    ))
+
+    assertResult(expected2)(actual2)
   }
 
 

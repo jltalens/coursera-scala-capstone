@@ -48,7 +48,19 @@ object Visualization {
     * @param range
     * @return estimated temperature
     */
-  def estimate(p: Location, range: Iterable[(Location, Double)]) : Double = ???
+  def estimateTempAt(p: Location, range: Iterable[(Location, Double)]) : Double = range.find(_._1 == p) match {
+    case Some((location, temp)) => temp
+    case None => {
+      val distanceTempSum = range
+        .foldLeft(0.0)((acc, tuple) => acc + (invertedDistance(p, tuple._1) * tuple._2))
+      val distanceSum = range
+        .foldLeft(0.0)((acc, tuple) => acc + invertedDistance(p, tuple._1))
+      distanceTempSum / distanceSum
+    }
+  }
+
+  def invertedDistance(p1: Location, p2: Location) : Double = 1 / distance(p1, p2)
+
 
   /**
     * @param points Pairs containing a value and its associated color

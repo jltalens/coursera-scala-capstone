@@ -7,14 +7,16 @@ import com.sksamuel.scrimage.{Image, Pixel}
   */
 object Visualization {
 
+  val dim : Int = 360 * 180
+
   /**
     * @param temperatures Known temperatures: pairs containing a location and the temperature at this location
     * @param location Location where to predict the temperature
     * @return The predicted temperature at `location`
     */
-  def predictTemperature(temperatures: Iterable[(Location, Double)], location: Location): Double = {
-    ???
-  }
+  def predictTemperature(temperatures: Iterable[(Location, Double)], location: Location): Double =
+    estimateTempAt(location, temperatures)
+
 
 
   /**
@@ -49,7 +51,7 @@ object Visualization {
     * @return estimated temperature
     */
   def estimateTempAt(p: Location, range: Iterable[(Location, Double)]) : Double = range.find(_._1 == p) match {
-    case Some((location, temp)) => temp
+    case Some((_, temp)) => temp
     case None => {
       val distanceTempSum = range
         .foldLeft(0.0)((acc, tuple) => acc + (invertedDistance(p, tuple._1) * tuple._2))
@@ -67,9 +69,42 @@ object Visualization {
     * @param value The value to interpolate
     * @return The color that corresponds to `value`, according to the color scale defined by `points`
     */
-  def interpolateColor(points: Iterable[(Double, Color)], value: Double): Color = {
-    ???
+  def interpolateColor(points: Iterable[(Double, Color)], value: Double): Color = points.find(_._1 == value) match {
+    case Some((_, color)) => color
+    case None => colorByLinearInterpolation(points, value)
   }
+
+  //  Coger la linea de puntos. Coger los puntos que dejan al valor dado en medio:
+  //
+  def colorByLinearInterpolation(points: Iterable[(Double, Color)], value: Double): Color = {
+    closestTwoPointsToGiven(points: Iterable[(Double, Color)], value: Double) match {
+      case (Some((_, color)), None) => color
+      case (None, Some((_, color))) => color
+      case (Some((p1, c1)), Some((p2, c2))) => {
+        val li = linearInterpolationValue(p1, p2, value) _
+        Color(
+          li(c1.red, c2.red),
+          li(c1.green, c2.green),
+          li(c1.blue, c2.blue)
+        )
+      }
+      case _ => Color(0,0,0)
+    }
+  }
+
+  def closestTwoPointsToGiven(points: Iterable[(Double, Color)], value: Double): (Option[(Double, Color)], Option[(Double, Color)]) = {
+    val partition = points.toList.sortBy(_._1).partition(_._1 < value)
+    (partition._1.reverse.headOption, partition._2.headOption)
+  }
+
+
+  def linearInterpolationValue(pointValueMin: Double, pointValueMax: Double, value: Double)(colorValueMin: Int, colorValueMax: Int): Int = {
+    val factor = (value - pointValueMin) / (pointValueMax - pointValueMin)
+    roundTo(colorValueMin + (colorValueMax - colorValueMin) * factor, 0).toInt
+  }
+
+  def roundTo(number: Double, decimals: Int) : Double =
+    BigDecimal(number).setScale(decimals, BigDecimal.RoundingMode.HALF_UP).toDouble
 
   /**
     * @param temperatures Known temperatures
@@ -78,6 +113,25 @@ object Visualization {
     */
   def visualize(temperatures: Iterable[(Location, Double)], colors: Iterable[(Double, Color)]): Image = {
     ???
+//    temperatures
+//      .map{p =>
+//        val color = interpolateColor(colors, p._2)
+//        (p._1, Pixel(color.red, color.green, color.blue, 1))
+//      }
+  }
+
+  def locationsToPixelArray(temps: Iterable[(Location, Pixel)]): Array[Pixel] = {
+    ???
+//    var pixels : Array[Pixel] = Array.ofDim(Visualization.dim)
+//    temps.foreach{ p =>
+//
+//    }
+  }
+
+  def locationInPixelArray(p: Location): Int = {
+    p.lon match {
+      case x if x >= 0 => roundTo(x, 0).toInt + 1 * 2
+    }
   }
 
 }

@@ -169,39 +169,43 @@ class VisualizationTest extends FunSuite with Checkers {
     assertResult(expected)(actual)
   }
 
-  test("'locationsToPixelArray() should take a location and a color and return a pixel in the top-right position") {
-    val pixel = Pixel(0, 0, 0, 1)
-    val input = List(
-      (Location(90.0, -180.0), pixel)
-    )
-    val expected : Array[Pixel] = Array.ofDim(Visualization.dim)
-    expected.update(0, pixel)
-    val actual = Visualization.locationsToPixelArray(input)
-
-    assertResult(expected)(actual)
-  }
-
-  test("'locationInPixelArray() should take a location of 90, -180 and return a position of 0") {
-    val input = Location(90, -180)
-    val expected = 0
-    val actual = Visualization.locationInPixelArray(input)
-
-    assertResult(expected)(actual)
-  }
-
-  test("'locationInPixelArray() should take a location of 90, 0 and return a position of 90") {
-    val input = Location(90, 0)
-    val expected = 180
-    val actual = Visualization.locationInPixelArray(input)
-
-    assertResult(expected)(actual)
-  }
-
-  test("'locationInPixelArray() should take a location of 90, 179 and return a position of 360") {
-    val input = Location(90, 170)
-    val expected = 360
-    val actual = Visualization.locationInPixelArray(input)
-
-    assertResult(expected)(actual)
-  }
+//  test("'locationsToPixelArray() should take a location and a color and return a pixel in the top-right position") {
+//    val pixel = Pixel(0, 0, 0, 1)
+//    val input = List(
+//      (Location(90.0, -180.0), pixel)
+//    )
+//    val expected : Array[Pixel] = Array.ofDim(Visualization.dim)
+//    expected.update(0, pixel)
+//    val actual = Visualization.locationsToPixelArray(input)
+//
+//    assertResult(expected)(actual)
+//  }
+//
+//  test("'coordinatesToArrayIdx() should take a location of 90, -180 and return a position of 0") {
+//    val lon = 90.0
+//    val lat = -180.0
+//    val expected = 0
+//    val actual = Visualization.coordinatesToArrayIdx(lon, lat)
+//
+//    assertResult(expected)(actual)
+//  }
+//
+//
+//  test("'coordinatesToArrayIdx() should take a location of 90, 180 and return a position of 360") {
+//    val lon = 90.0
+//    val lat = 180.0
+//    val expected = 360
+//    val actual = Visualization.coordinatesToArrayIdx(lon, lat)
+//
+//    assertResult(expected)(actual)
+//  }
+//
+//  test("'coordinatesToArrayIdx()' should take a location of 0, 0 and return the idx of the center of the image") {
+//    val lon = 0
+//    val lat = 0
+//    val expected = 360 * (90 / 2)
+//    val actual  = Visualization.coordinatesToArrayIdx(lon, lat)
+//
+//    assertResult(expected)(actual)
+//  }
 }

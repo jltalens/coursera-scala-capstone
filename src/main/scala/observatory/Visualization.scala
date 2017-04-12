@@ -7,7 +7,9 @@ import com.sksamuel.scrimage.{Image, Pixel}
   */
 object Visualization {
 
-  val dim : Int = 360 * 180
+  val width : Int = 360
+  val height: Int = 180
+  val dim : Int = width * height
 
   /**
     * @param temperatures Known temperatures: pairs containing a location and the temperature at this location
@@ -112,26 +114,53 @@ object Visualization {
     * @return A 360×180 image where each pixel shows the predicted temperature at its location
     */
   def visualize(temperatures: Iterable[(Location, Double)], colors: Iterable[(Double, Color)]): Image = {
-    ???
+    val imageWidth = Visualization.width
+    val imageHeight = Visualization.height
+    val locationMap = posToLocation(imageWidth, imageHeight) _
+
+    val pixels = (0 until imageHeight * imageWidth).par.map {
+      pos =>
+        pos -> interpolateColor(
+          colors,
+          predictTemperature(
+            temperatures,
+            locationMap(pos)
+          )
+        ).pixel()
+    }
+      .seq
+      .sortBy(_._1)
+      .map(_._2)
+
+    Image(imageWidth, imageHeight, pixels.toArray)
+  }
 //    temperatures
 //      .map{p =>
 //        val color = interpolateColor(colors, p._2)
 //        (p._1, Pixel(color.red, color.green, color.blue, 1))
 //      }
-  }
-
-  def locationsToPixelArray(temps: Iterable[(Location, Pixel)]): Array[Pixel] = {
-    ???
-//    var pixels : Array[Pixel] = Array.ofDim(Visualization.dim)
-//    temps.foreach{ p =>
+//  }
 //
-//    }
-  }
+//  def locationsToPixelArray(temps: Iterable[(Location, Pixel)]): Array[Pixel] = {
+//    ???
+////    var pixels : Array[Pixel] = Array.ofDim(Visualization.dim)
+////    temps.foreach{ p =>
+////
+////    }
+//  }
+//
+//  def coordinatesToArrayIdx(lon: Double, lat: Double): Int = {
+//    roundTo(lat, 0).toInt + 180
+//  }
 
-  def locationInPixelArray(p: Location): Int = {
-    p.lon match {
-      case x if x >= 0 => roundTo(x, 0).toInt + 1 * 2
-    }
+  def posToLocation(imageWidth: Int, imageHeight: Int)(pos: Int): Location = {
+    val widthFactor = 180 * 2 / imageWidth.toDouble
+    val heightFactor = 90 * 2 / imageHeight.toDouble
+
+    val x: Int = pos % imageWidth
+    val y: Int = pos / imageWidth
+
+    Location(90 - (y * heightFactor), (x * widthFactor) - 180)
   }
 
 }

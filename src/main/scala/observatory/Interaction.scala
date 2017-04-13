@@ -26,11 +26,13 @@ object Interaction {
     * @return A 256×256 image showing the contents of the tile defined by `x`, `y` and `zooms`
     */
   def tile(temperatures: Iterable[(Location, Double)], colors: Iterable[(Double, Color)], zoom: Int, x: Int, y: Int): Image = {
-    val pixels = (0 until 256 * 266)
+    val width = 256
+    val height = 256
+    val pixels = (0 until width * height)
       .par
       .map{ p=>
-        val xP = (p % 256).toDouble / 256 + x
-        val yP = (p / 256).toDouble / 256 + y
+        val xP = (p % width).toDouble / width + x
+        val yP = (p / height).toDouble / height + y
         p -> Visualization.interpolateColor(
           colors,
           Visualization.predictTemperature(
@@ -43,7 +45,7 @@ object Interaction {
       .sortBy(_._1)
       .map(_._2)
 
-    Image(256, 256, pixels.toArray)
+    Image(width, height, pixels.toArray)
   }
 
   /**

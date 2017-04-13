@@ -1,5 +1,6 @@
 package observatory
 
+
 /**
   * 4th milestone: value-added information
   */
@@ -11,7 +12,10 @@ object Manipulation {
     *         returns the predicted temperature at this location
     */
   def makeGrid(temperatures: Iterable[(Location, Double)]): (Int, Int) => Double = {
-    ???
+    def calculateTemp(temperatures: Iterable[(Location, Double)])(x: Int, y: Int) = {
+      Visualization.predictTemperature(temperatures, Location(x, y))
+    }
+    calculateTemp(temperatures)
   }
 
   /**
